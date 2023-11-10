@@ -1,5 +1,5 @@
 
-import re
+
 
 import numpy as np
 import pandas as pd
@@ -13,22 +13,8 @@ from numpy.linalg import norm
 conversionDictionary = {"a":1, "b":2, "c":3, "d":4, "e":5, "f":6, "g":7, "h":8, "i":9, "j":10, "k":11, "l":12, "m":13, "n":14, "o":15, "p":16, "q":17, "r":18, "s":19, "t":20, "u":21, "v":22, "w":23, "x":24, "y":25, "z":26}
 corpusMonograms = [0.0855, 0.0160, 0.0316, 0.0387, 0.1210, 0.0218, 0.0209, 0.0496, 0.0733, 0.0022, 0.0081, 0.0421, 0.0253, 0.0717, 0.0747, 0.0207, 0.0010, 0.0633, 0.0673, 0.0894, 0.0268, 0.0106, 0.0183, 0.0019, 0.0172, 0.0011]
 corpusTetragrams = {"tion" : 0.31, "nthe" : 0.27, "ther" : 0.24, "that" : 0.21, "ofth" : 0.19, "fthe" : 0.19, "thes" : 0.18, "with" : 0.18, "inth" : 0.17, "atio" : 0.17, "othe" : 0.16, "tthe" : 0.16, "dthe" : 0.15, "ingt" : 0.15, "ethe" : 0.15, "sand" : 0.14, "sthe" : 0.14, "here" : 0.13, "thec" : 0.13, "ment" : 0.12, "them" : 0.12, "rthe" : 0.12, "thep" : 0.11, "from" : 0.10, "this" : 0.10, "ting" : 0.10, "thei" : 0.10, "ngth" : 0.10, "ions" : 0.10, "andt" : 0.10}
-corpusMonogramMagnitude = np.linalg.norm(corpusMonograms)
-
-
-# Load in the ciphertext from the file
-ciphertext = str(open('InputAndOutputTexts\ciphertext.txt', encoding="utf-8").read())
-
-# Formats the ciphertext so that only the text remains
-def FormatCiphertext():
-    global ciphertext
-
-    # Removes any spaces within the text, and converts it all into lowercase
-    ciphertext = ciphertext.replace(" ", "")
-    ciphertext = ciphertext.lower()
-
-    # Removes any special character from the text, and keeps only the text
-    ciphertext = re.sub('[\W\d_]+', '', ciphertext)
+corpusMonogramMagnitude = norm(corpusMonograms)
+corpusTetragramFitness = 0
 
 # Converts a character into an integer depending on its alphabetical position
 def CharacterToInteger(character):
@@ -94,30 +80,81 @@ def CalculateMonogramFitness(inputFrequencies):
     fitnessValue = np.dot(inputFrequencies, corpusMonograms)/(norm(inputFrequencies)*corpusMonogramMagnitude)
 
     # Returns the monogram fitness
-    return fitnessValue
+    return float(fitnessValue)
 
 # Calculates the fitness of the given tetragram fitnesses
 # Lower negative leads to a better fitness
 def CalculateTetragramFitness(inputFrequencies):
     global corpusTetragrams
 
+    # Converts the values of corpus frequencies into a list
     corpusFrequencies = list(corpusTetragrams.values())
 
+    # Sets the current tetragram fitness to 0
     tetragramFitness = 0
 
+    # Calculate the fitness of each tetragram, and sums them together
     for i in range(30):
         tetragramFitness += inputFrequencies[i] * np.log(corpusFrequencies[i])
 
     return tetragramFitness
 
-FormatCiphertext()
 
-monogramFrequencies = CalculateMonogramFrequencies(ciphertext)
-tetragramFrequencies = CalculateTetragramFrequencies(ciphertext)
 
-print(CalculateMonogramFitness(monogramFrequencies))
-print(CalculateTetragramFitness(tetragramFrequencies))
+# Sets up the value for the fitness of english text
+def SetUpEnglishFitness():
+    global corpusTetragrams
+    global corpusTetragramFitness
 
+    corpusTetragramFitness = {}
+
+    with open("CorpusFrequencies\corpusQuadgrams.txt") as f:
+        for line in f:
+            quad, frequency = line.split(",")
+            corpusTetragramFitness[quad] = float(frequency)
+
+
+def FindFitness(inputText):
+    global corpusTetragramFitness
+
+    # Generate all possible four-letter combinations
+    allQuadgrams = [inputText[idx:idx+4] for idx in range(len(inputText)-3)]
+
+    # Initialize a variable to store the sum of quadgram frequencies
+    totalQuadgramFrequency = 0
+    
+    # Iterate over each quadgram in the text
+    for quadgram in allQuadgrams:
+        # Look up the quadgram in the dictionary and add its frequency to the total
+        totalQuadgramFrequency += corpusTetragramFitness.get(quadgram.upper(), 0)
+
+    # Calculate the average quadgram frequency and return its absolute value
+    return (abs(totalQuadgramFrequency) / len(allQuadgrams))
+
+SetUpEnglishFitness()
+
+# # Calculates the fitness of a given text
+# def FindFitness(inputText):
+#     global corpusTetragramFitness
+
+#     inputTetragramFrequencies = list(CalculateTetragramFrequencies(inputText))
+
+#     inputFitness = 0
+
+#     for i in range(30):
+#         inputFitness += np.log(inputTetragramFrequencies[i])
+
+#     inputFitness = float(np.abs(inputFitness - corpusTetragramFitness) / inputFitness)
+
+#     # Initialize a variable to store the sum of quadgram frequencies
+#     total_frequency = 0
+    
+#     # Iterate over each quadgram in the text
+#     for quad in quadtext:
+#         # Look up the quadgram in the dictionary and add its frequency to the total
+#         total_frequency += quaddict.get(quad.upper(), 0)
+
+#     return inputFitness
 
 # plt.bar(conversionDictionary.keys(), frequencies)
 # plt.show()
