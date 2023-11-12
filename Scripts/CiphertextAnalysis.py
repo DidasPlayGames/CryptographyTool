@@ -106,15 +106,25 @@ def SetUpEnglishFitness():
     global corpusTetragrams
     global corpusTetragramFitness
 
-    corpusTetragramFitness = {}
+    corpusTetragrams = {}
 
     with open("CorpusFrequencies\corpusQuadgrams.txt") as f:
         for line in f:
             quad, frequency = line.split(",")
-            corpusTetragramFitness[quad] = float(frequency)
+            corpusTetragrams[quad] = float(frequency)
 
+    corpusList = list(corpusTetragrams.values())
+
+    for i in range(len(corpusTetragrams)):
+        corpusTetragramFitness += corpusList[i]
+
+
+    corpusTetragramFitness = float(corpusTetragramFitness / len(corpusTetragrams))
+
+    print(corpusTetragramFitness, "english")
 
 def FindFitness(inputText):
+    global corpusTetragrams
     global corpusTetragramFitness
 
     # Generate all possible four-letter combinations
@@ -126,10 +136,18 @@ def FindFitness(inputText):
     # Iterate over each quadgram in the text
     for quadgram in allQuadgrams:
         # Look up the quadgram in the dictionary and add its frequency to the total
-        totalQuadgramFrequency += corpusTetragramFitness.get(quadgram.upper(), 0)
+        totalQuadgramFrequency += corpusTetragrams.get(quadgram.upper(), 0)
+
+    print(totalQuadgramFrequency, "given total")
 
     # Calculate the average quadgram frequency and return its absolute value
-    return (abs(totalQuadgramFrequency) / len(allQuadgrams))
+    quadgramFitness = abs((totalQuadgramFrequency) / len(allQuadgrams))
+
+    print(quadgramFitness, "given average abs")
+    print(abs(quadgramFitness - corpusTetragramFitness) / quadgramFitness, "normalised average")
+
+
+    return abs(quadgramFitness - corpusTetragramFitness) / quadgramFitness
 
 SetUpEnglishFitness()
 

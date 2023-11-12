@@ -3,6 +3,8 @@ import re
 import CiphertextAnalysis as analysis
 import MonoalphabeticSubstitution as monoalphabetic
 
+import MonoSolver as mono
+
 # Load in the ciphertext from the file
 ciphertext = str(open('InputAndOutputTexts\ciphertext.txt', encoding="utf-8").read())
 
@@ -18,8 +20,9 @@ def FormatCiphertext():
     ciphertext = re.sub('[\W\d_]+', '', ciphertext)
 
 FormatCiphertext()
-# print(analysis.CalculateMonogramFitness(analysis.CalculateMonogramFrequencies(ciphertext)))
 
-monoalphabetic.BreakMonoalphabeticSubstitution(ciphertext)
+# monoalphabetic.BreakMonoalphabeticSubstitution(ciphertext)
 
+# print(analysis.FindFitness(ciphertext))
 
+mono.BeginDecipher(ciphertext)

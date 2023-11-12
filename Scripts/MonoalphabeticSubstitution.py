@@ -176,7 +176,7 @@ def TheMainLoop(currentKey):
         print(currentFitness, "current")
         print(newFitness, "new")
 
-        if(newFitness > currentFitness):
+        if(newFitness < currentFitness):
             improvementCount += 1
 
             open("InputAndOutputTexts\ciphertext.txt", "w").write(str(newCiphertext))
