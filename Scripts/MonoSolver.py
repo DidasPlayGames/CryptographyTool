@@ -4,7 +4,7 @@ import random
 
 # Defines a population, one key that is chosen, and the fitness of that chosen key
 population = []
-chosenKey = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+chosenKey = []
 
 # Current generation number
 generation = 0
@@ -18,11 +18,13 @@ def BeginDecipher(ciphertext):
 
     localCiphertext = ciphertext
 
-    InitialisePopulation(100)
+    InitialisePopulation(10)
 
-    for i in range(20):
+    for i in range(400):
         MutatePopulation()
         ChooseKey()
+
+    print(chosenKey)
 
     print(MonoalphabeticDecipher(localCiphertext, chosenKey))
 
@@ -52,7 +54,8 @@ def MonoalphabeticDecipher(textList, keyList):
 
 # Makes a random switch in the key
 def RandomKeySwitch(currentKey):
-    newKey = currentKey
+
+    newKey = list(currentKey)
 
     # Chooses 2 random keys to swap
     index1 = random.randint(0, 25)
@@ -72,45 +75,63 @@ def RandomKeySwitch(currentKey):
 def InitialisePopulation(populationSize):
     global population
     global masterKey
+    global chosenKey
 
-    for i in range(populationSize):
-        population.append(masterKey)
+    chosenKey = list(masterKey)
+
+    population.append(list(masterKey))
+
+    for i in range(populationSize - 1):
+        for i in range(100):
+            masterKey = RandomKeySwitch(masterKey)
+
+        population.append(list(RandomKeySwitch(masterKey)))
 
 
 def MutatePopulation():
     global chosenKey
     global population
+    global masterKey
 
     # Declares a new, empty population
     newPopulation = []
 
     # Adds at least one uneffected copy of the chosen key
-    newPopulation.append(list(population[0]))
+    newPopulation.append(list(chosenKey))
 
     # Mutates all other keys for the length of the population
     for i in range(len(population) - 1):
-        newPopulation.append(list(RandomKeySwitch(chosenKey)))
+        newPopulation.append(RandomKeySwitch(list(chosenKey)))
 
     # Sets the current population as the new population
-    population = newPopulation
+    population = list(newPopulation)
 
 def ChooseKey():
     global population
     global chosenKey
+    global otherKey
 
     # Sets up variables to hold the highest fitness key in the population
-    highestFitness = 999999
-    highsetKey = []
+    highestFitness = -10
+    highsetKey = masterKey
 
     # Finds the highest fitness key from the population
     for i in range(len(population)):
-        # Finds the fitness for the key
-        currentFitness = float(analysis.FindFitness(MonoalphabeticDecipher(localCiphertext, population[i])))
 
-        # Checks if the text has a higher fitness than the previous fitness, and upd
-        if(currentFitness < highestFitness):
+        # Finds the fitness for the key
+
+        currentFitness = analysis.SearchFitness(MonoalphabeticDecipher(localCiphertext, population[i]))
+        # currentFitness = analysis.FindFitness(MonoalphabeticDecipher(localCiphertext, population[i]))
+        # currentFitness = analysis.AnotherFitnessFunction(MonoalphabeticDecipher(localCiphertext, population[i]))
+
+        print(highestFitness)
+
+        # Checks if the text has a higher fitness than the previous fitness, and updates if neeeded
+        if(currentFitness >= highestFitness):
             highestFitness = currentFitness
             highsetKey = list(population[i])
 
     # Sets the chosen key to the highest key form the generation
     chosenKey = highsetKey
+
+
