@@ -1,6 +1,7 @@
 
 import CiphertextAnalysis as analysis
 import random
+import MonoalphabeticTools as monoTools
 
 # Defines a population, one key that is chosen, and the fitness of that chosen key
 population = []
@@ -13,48 +14,39 @@ generation = 0
 masterKey = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 localCiphertext = ""
 
-def BeginDecipher(ciphertext):
+# This function is called to begin the decipher of a text
+# Recommended values are popSize = 5 and genNum = 300
+def BeginDecipher(ciphertext, populationSize, generationNum):
     global localCiphertext
+    global population
+    global chosenKey
+    global masterKey
 
+    # Sets up a local variable for the provided ciphertext
     localCiphertext = ciphertext
 
-    InitialisePopulation(10)
+    # Intialises a population of a set size
+    InitialisePopulation(populationSize)
 
-    for i in range(400):
+    # Iterates the seleciton process for the number of desired generations
+    for i in range(generationNum):
         MutatePopulation()
         ChooseKey()
 
-    print(chosenKey)
-
-    print(MonoalphabeticDecipher(localCiphertext, chosenKey))
-
-# Deciphers a text given a key
-def MonoalphabeticDecipher(textList, keyList):
-    
-    # Creates an empty list which describes the ciphertext as integers
-    intList = []
-
-    # Converts the list of characters of ciphertext into a list of integers
-    for i in range(len(textList)):
-        intList.append(analysis.CharacterToInteger(textList[i]))
-
-    # Creates an empty list with all the new text
-    plainList = []
-
-    # Substitutes a letter for each of the ciphertext letters
-    for i in range(len(intList)):
-        plainList.append(keyList[intList[i] - 1])
-    
-    # Joins up the list of plaintext letters into a word
-    decipheredText = "".join(plainList)
-
-    # Returns the deciphered text
-    return decipheredText
-
+    # If the key provided produces correct text, print the text and key, and restart the program otherwise
+    if(analysis.FindFitness(monoTools.MonoalphabeticDecipher(localCiphertext, chosenKey)) <= 0.99):
+        masterKey = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+        population = []
+        chosenKey = []
+        BeginDecipher(localCiphertext)
+    else:
+        print(chosenKey)
+        print(monoTools.MonoalphabeticDecipher(localCiphertext, chosenKey))
 
 # Makes a random switch in the key
 def RandomKeySwitch(currentKey):
 
+    # Creates the new key as a copy of the current key 
     newKey = list(currentKey)
 
     # Chooses 2 random keys to swap
@@ -120,9 +112,7 @@ def ChooseKey():
 
         # Finds the fitness for the key
 
-        currentFitness = analysis.SearchFitness(MonoalphabeticDecipher(localCiphertext, population[i]))
-        # currentFitness = analysis.FindFitness(MonoalphabeticDecipher(localCiphertext, population[i]))
-        # currentFitness = analysis.AnotherFitnessFunction(MonoalphabeticDecipher(localCiphertext, population[i]))
+        currentFitness = analysis.FindFitness(monoTools.MonoalphabeticDecipher(localCiphertext, population[i]))
 
         print(highestFitness)
 

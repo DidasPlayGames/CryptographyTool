@@ -1,9 +1,11 @@
+
 import re
 
 import CiphertextAnalysis as analysis
-import MonoalphabeticSubstitution as monoalphabetic
+import DecipheringTools.MonoSolver as mono
+import DecipheringTools.CaesarSolver as caesar
+import DecipheringTools.AffineSolver as affine
 
-import MonoSolver as mono
 
 # Load in the ciphertext from the file
 ciphertext = str(open('InputAndOutputTexts\ciphertext.txt', encoding="utf-8").read())
@@ -21,8 +23,6 @@ def FormatCiphertext():
 
 FormatCiphertext()
 
-# monoalphabetic.BreakMonoalphabeticSubstitution(ciphertext)
+# mono.BeginDecipher(ciphertext)
 
-# print(analysis.FindFitness(ciphertext))
-
-mono.BeginDecipher(ciphertext)
+affine.BeginDecipher(ciphertext)
