@@ -5,6 +5,7 @@ import CiphertextAnalysis as analysis
 import DecipheringTools.MonoSolver as mono
 import DecipheringTools.CaesarSolver as caesar
 import DecipheringTools.AffineSolver as affine
+import DecipheringTools.PermutationSolver as permutation
 
 
 # Load in the ciphertext from the file
@@ -24,5 +25,8 @@ def FormatCiphertext():
 FormatCiphertext()
 
 # mono.BeginDecipher(ciphertext)
+# caesar.BeginDecipher(ciphertext)
+# affine.BeginDecipher(ciphertext)
 
-affine.BeginDecipher(ciphertext)
+newText = permutation.CompletePermutation(permutation.ConvertIntoRows(ciphertext, 4), [4, 3, 2, 1])
+print(newText)
