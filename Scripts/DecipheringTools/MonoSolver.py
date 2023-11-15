@@ -50,8 +50,8 @@ def RandomKeySwitch(currentKey):
     newKey = list(currentKey)
 
     # Chooses 2 random keys to swap
-    index1 = random.randint(0, 25)
-    index2 = random.randint(0, 25)
+    index1 = random.randint(0, len(currentKey) - 1)
+    index2 = random.randint(0, len(currentKey) - 1)
 
     # Archives one of the elements, so that it is preserved for the switch
     index1Archive = newKey[index1]
@@ -111,7 +111,6 @@ def ChooseKey():
     for i in range(len(population)):
 
         # Finds the fitness for the key
-
         currentFitness = analysis.FindFitness(monoTools.MonoalphabeticDecipher(localCiphertext, population[i]))
 
         print(highestFitness)

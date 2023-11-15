@@ -28,5 +28,4 @@ FormatCiphertext()
 # caesar.BeginDecipher(ciphertext)
 # affine.BeginDecipher(ciphertext)
 
-newText = permutation.CompletePermutation(permutation.ConvertIntoRows(ciphertext, 4), [4, 3, 2, 1])
-print(newText)
+permutation.BeginDecipher(ciphertext, 10)
